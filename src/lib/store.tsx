@@ -45,7 +45,7 @@ interface ContextoApp {
   productos: Producto[]
   movimientos: MovimientoStock[]
   servicios: Servicio[]
-  agregarProducto: (producto: Omit<Producto, "id" | "actualizadoEn">) => void
+  agregarProducto: (producto: Omit<Producto, "id" | "actualizadoEn">) => string
   actualizarProducto: (id: string, cambios: Partial<Producto>) => void
   eliminarProducto: (id: string) => void
   registrarMovimiento: (movimiento: {
@@ -55,7 +55,7 @@ interface ContextoApp {
     motivo: string
     referencia?: string
   }) => boolean
-  agregarServicio: (servicio: Omit<Servicio, "id" | "numero">) => void
+  agregarServicio: (servicio: Omit<Servicio, "id" | "numero">) => string
   actualizarServicio: (id: string, cambios: Partial<Servicio>) => void
   eliminarServicio: (id: string) => void
   agregarNota: (servicioId: string, contenido: string, autor?: string) => void
@@ -76,13 +76,15 @@ export function ProveedorDatos({ children }: { children: ReactNode }) {
   }, [datos])
 
   const agregarProducto = useCallback((producto: Omit<Producto, "id" | "actualizadoEn">) => {
+    const id = nuevoId("prod")
     setDatos((actual) => ({
       ...actual,
       productos: [
-        { ...producto, id: nuevoId("prod"), actualizadoEn: new Date().toISOString() },
+        { ...producto, id, actualizadoEn: new Date().toISOString() },
         ...actual.productos,
       ],
     }))
+    return id
   }, [])
 
   const actualizarProducto = useCallback((id: string, cambios: Partial<Producto>) => {
@@ -153,6 +155,7 @@ export function ProveedorDatos({ children }: { children: ReactNode }) {
   )
 
   const agregarServicio = useCallback((servicio: Omit<Servicio, "id" | "numero">) => {
+    const id = nuevoId("srv")
     setDatos((actual) => {
       const ultimoNumero = actual.servicios.reduce((maximo, item) => {
         const valor = Number(item.numero.split("-").at(-1))
@@ -164,13 +167,14 @@ export function ProveedorDatos({ children }: { children: ReactNode }) {
         servicios: [
           {
             ...servicio,
-            id: nuevoId("srv"),
+            id,
             numero: `SRV-${new Date().getFullYear()}-${String(ultimoNumero + 1).padStart(4, "0")}`,
           },
           ...actual.servicios,
         ],
       }
     })
+    return id
   }, [])
 
   const actualizarServicio = useCallback((id: string, cambios: Partial<Servicio>) => {

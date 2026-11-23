@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
-  ArrowDownRight,
-  ArrowUpRight,
   Boxes,
   CircleDollarSign,
+  Eye,
   MoreHorizontal,
+  Package,
   Pencil,
   Plus,
   Search,
@@ -14,8 +15,6 @@ import {
 import { toast } from "sonner"
 import { EstadoStockBadge } from "@/components/comunes/Indicadores"
 import { EncabezadoPagina } from "@/components/layout/Layout"
-import { MovimientoDialog } from "@/components/stock/MovimientoDialog"
-import { ProductoDialog } from "@/components/stock/ProductoDialog"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -65,14 +64,10 @@ function estadoDe(producto: Producto): FiltroEstado {
 
 export default function Stock() {
   const { productos, movimientos, eliminarProducto } = useDatos()
+  const navegar = useNavigate()
   const [busqueda, setBusqueda] = useState("")
   const [categoria, setCategoria] = useState<Categoria | "todas">("todas")
   const [estado, setEstado] = useState<FiltroEstado>("todos")
-  const [dialogoProducto, setDialogoProducto] = useState(false)
-  const [productoEditar, setProductoEditar] = useState<Producto | null>(null)
-  const [dialogoMovimiento, setDialogoMovimiento] = useState(false)
-  const [productoMovimiento, setProductoMovimiento] = useState<Producto | null>(null)
-  const [tipoMovimiento, setTipoMovimiento] = useState<"entrada" | "salida">("entrada")
   const [productoEliminar, setProductoEliminar] = useState<Producto | null>(null)
 
   const filtrados = useMemo(() => {
@@ -97,22 +92,6 @@ export default function Stock() {
     (movimiento) => new Date(movimiento.fecha).getMonth() === new Date().getMonth(),
   ).length
 
-  function abrirNuevo() {
-    setProductoEditar(null)
-    setDialogoProducto(true)
-  }
-
-  function abrirEdicion(producto: Producto) {
-    setProductoEditar(producto)
-    setDialogoProducto(true)
-  }
-
-  function abrirMovimiento(producto: Producto, tipo: "entrada" | "salida") {
-    setProductoMovimiento(producto)
-    setTipoMovimiento(tipo)
-    setDialogoMovimiento(true)
-  }
-
   const hayFiltros = busqueda !== "" || categoria !== "todas" || estado !== "todos"
 
   return (
@@ -121,7 +100,7 @@ export default function Stock() {
         titulo="Control de stock"
         descripcion="Repuestos, códigos, niveles y movimientos del inventario"
         acciones={
-          <Button onClick={abrirNuevo}>
+          <Button onClick={() => navegar("/productos/nuevo")}>
             <Plus className="size-4" aria-hidden="true" />
             Nuevo producto
           </Button>
@@ -131,7 +110,7 @@ export default function Stock() {
       <section aria-label="Resumen de inventario" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { titulo: "Referencias", valor: formatearNumero(productos.length), detalle: "Productos cargados", icono: <Boxes className="size-[18px]" /> },
-          { titulo: "Unidades", valor: formatearNumero(unidadesTotales), detalle: "Disponibles en depósito", icono: <ArrowUpRight className="size-[18px]" /> },
+          { titulo: "Unidades", valor: formatearNumero(unidadesTotales), detalle: "Disponibles en depósito", icono: <Package className="size-[18px]" /> },
           { titulo: "Valor total", valor: formatearMoneda(valorTotal), detalle: "Al precio actual", icono: <CircleDollarSign className="size-[18px]" /> },
           { titulo: "Stock bajo", valor: formatearNumero(conStockBajo), detalle: `${movimientosMes} movimientos este mes`, icono: <TriangleAlert className="size-[18px]" /> },
         ].map((metrica) => (
@@ -150,43 +129,26 @@ export default function Stock() {
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <Input
-                id="buscar-producto"
-                type="search"
-                value={busqueda}
+                id="buscar-producto" type="search" value={busqueda}
                 onChange={(evento) => setBusqueda(evento.target.value)}
-                placeholder="Nombre, código, código de barras o proveedor…"
-                className="pl-9"
-                autoComplete="off"
+                placeholder="Nombre, código, código de barras o proveedor…" className="pl-9" autoComplete="off"
               />
             </div>
           </div>
-
           <div className="w-full space-y-1.5 lg:w-48">
             <Label htmlFor="filtro-categoria">Categoría</Label>
-            <Select
-              value={categoria}
-              onValueChange={(valor) => setCategoria(valor as Categoria | "todas")}
-            >
-              <SelectTrigger id="filtro-categoria" name="categoria">
-                <SelectValue />
-              </SelectTrigger>
+            <Select value={categoria} onValueChange={(valor) => setCategoria(valor as Categoria | "todas")}>
+              <SelectTrigger id="filtro-categoria" name="categoria"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todas">Todas</SelectItem>
-                {CATEGORIAS.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
+                {CATEGORIAS.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div className="w-full space-y-1.5 lg:w-44">
             <Label htmlFor="filtro-estado">Estado</Label>
             <Select value={estado} onValueChange={(valor) => setEstado(valor as FiltroEstado)}>
-              <SelectTrigger id="filtro-estado" name="estado">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger id="filtro-estado" name="estado"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="disponible">Disponible</SelectItem>
@@ -195,7 +157,6 @@ export default function Stock() {
               </SelectContent>
             </Select>
           </div>
-
           {hayFiltros && (
             <Button variant="ghost" onClick={() => { setBusqueda(""); setCategoria("todas"); setEstado("todos") }}>
               Limpiar filtros
@@ -226,56 +187,53 @@ export default function Stock() {
                 </TableRow>
               ) : (
                 filtrados.map((producto) => (
-                  <TableRow key={producto.id}>
-                    <TableCell className="tabular whitespace-nowrap text-xs font-medium text-muted-foreground">
-                      {producto.codigo}
-                    </TableCell>
+                  <TableRow
+                    key={producto.id}
+                    className="cursor-pointer"
+                    tabIndex={0}
+                    aria-label={`Ver detalle de ${producto.nombre}`}
+                    onClick={() => navegar(`/productos/${producto.id}`)}
+                    onKeyDown={(evento) => {
+                      if (evento.key === "Enter" || evento.key === " ") {
+                        evento.preventDefault()
+                        navegar(`/productos/${producto.id}`)
+                      }
+                    }}
+                  >
+                    <TableCell className="tabular whitespace-nowrap text-xs font-medium text-muted-foreground">{producto.codigo}</TableCell>
                     <TableCell className="max-w-[260px]">
                       <p className="truncate text-sm font-medium">{producto.nombre}</p>
-                      <p className="tabular truncate text-[11px] text-muted-foreground">
-                        CB: {producto.codigoBarras || "—"}
-                      </p>
+                      <p className="tabular truncate text-[11px] text-muted-foreground">CB: {producto.codigoBarras || "—"}</p>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-xs text-muted-foreground">{producto.categoria}</span>
-                    </TableCell>
+                    <TableCell><span className="text-xs text-muted-foreground">{producto.categoria}</span></TableCell>
                     <TableCell className="tabular text-xs text-muted-foreground">{producto.ubicacion || "—"}</TableCell>
-                    <TableCell className="tabular text-right text-sm font-semibold">
-                      {formatearNumero(producto.stock)}
-                    </TableCell>
-                    <TableCell>
-                      <EstadoStockBadge stock={producto.stock} minimo={producto.stockMinimo} />
-                    </TableCell>
-                    <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
-                      {formatearMoneda(producto.precio)}
-                    </TableCell>
+                    <TableCell className="tabular text-right text-sm font-semibold">{formatearNumero(producto.stock)}</TableCell>
+                    <TableCell><EstadoStockBadge stock={producto.stock} minimo={producto.stockMinimo} /></TableCell>
+                    <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">{formatearMoneda(producto.precio)}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" aria-label={`Acciones de ${producto.nombre}`}>
+                          <Button
+                            variant="ghost" size="icon"
+                            aria-label={`Acciones de ${producto.nombre}`}
+                            onClick={(evento) => evento.stopPropagation()}
+                          >
                             <MoreHorizontal className="size-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" onClick={(evento) => evento.stopPropagation()}>
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onSelect={() => abrirEdicion(producto)}>
+                          <DropdownMenuItem onSelect={() => navegar(`/productos/${producto.id}`)}>
+                            <Eye className="size-4" aria-hidden="true" />
+                            Ver detalle
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => navegar(`/productos/${producto.id}/editar`)}>
                             <Pencil className="size-4" aria-hidden="true" />
                             Editar producto
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => abrirMovimiento(producto, "entrada")}>
-                            <ArrowUpRight className="size-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                            Registrar entrada
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => abrirMovimiento(producto, "salida")}>
-                            <ArrowDownRight className="size-4 text-sky-600 dark:text-sky-400" aria-hidden="true" />
-                            Registrar salida
-                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => setProductoEliminar(producto)}
-                          >
+                          <DropdownMenuItem variant="destructive" onSelect={() => setProductoEliminar(producto)}>
                             <Trash2 className="size-4" aria-hidden="true" />
                             Eliminar
                           </DropdownMenuItem>
@@ -292,18 +250,6 @@ export default function Stock() {
           Mostrando {filtrados.length} de {productos.length} productos
         </div>
       </Card>
-
-      <ProductoDialog
-        abierto={dialogoProducto}
-        alCambiar={setDialogoProducto}
-        producto={productoEditar}
-      />
-      <MovimientoDialog
-        abierto={dialogoMovimiento}
-        alCambiar={setDialogoMovimiento}
-        producto={productoMovimiento}
-        tipo={tipoMovimiento}
-      />
 
       <Dialog open={productoEliminar !== null} onOpenChange={(valor) => { if (!valor) setProductoEliminar(null) }}>
         <DialogContent className="sm:max-w-md">

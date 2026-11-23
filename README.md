@@ -15,13 +15,15 @@ Demo de **control de stock** y **gestión de servicios** para un comercio de rep
 Pantalla inicial. KPIs de inventario, gráfico de movimientos de los últimos 14 días, distribución del valor del stock por categoría, próximas entregas, alertas de stock bajo y últimos movimientos.
 
 ### Stock
-- Alta, edición y eliminación de repuestos.
+- Alta, edición y eliminación de repuestos en páginas propias (`/productos/nuevo`, `/productos/:id/editar`).
+- Al hacer clic en una fila se abre `/productos/:id`: ficha del repuesto, estadísticas de entradas/salidas, gráfico de barras e historial, con botones para registrar entradas y salidas.
 - Campos: código interno, nombre, **código de barras**, categoría, ubicación, stock actual, stock mínimo, precio y proveedor.
 - Registro de **entradas y salidas** con motivo y referencia; el stock se actualiza y queda historial.
 - Búsqueda por nombre, código, código de barras o proveedor; filtros por categoría y estado.
 
 ### Servicios
-- Alta, edición y eliminación de servicios.
+- Alta, edición y eliminación de servicios en páginas propias (`/servicios/nuevo`, `/servicios/:id/editar`).
+- Al hacer clic en una fila se abre `/servicios/:id`: ficha completa con patente, tiempos, combustible, repuestos, total, revisión, conclusión y notas (se pueden agregar notas y cambiar el estado).
 - Campos: **patente**, vehículo, cliente, teléfono, tipo de trabajo, estado, fecha de ingreso, entrega estimada y real.
 - **Combustible**: nivel al ingreso, reposición en litros y observaciones.
 - **Tiempo en garage** calculado automáticamente.
@@ -66,14 +68,14 @@ src/
   components/
     comunes/       Indicadores y badges reutilizables
     layout/        Shell, sidebar, header y encabezados
-    stock/         Diálogos de producto y movimientos
-    servicios/     Diálogo de servicio y hoja de detalle
+    stock/         Diálogo de movimientos de stock
+    servicios/     Etiquetas reutilizables de servicios
     ui/            Componentes shadcn/ui
   lib/
     format.ts      Formateo con Intl (moneda, fechas, tiempos)
     seed.ts        Datos de ejemplo
     store.tsx      Contexto + persistencia en localStorage
     types.ts       Modelo de datos
-  pages/           Dashboard, Stock y Servicios
+  pages/           Dashboard, Stock, Servicios y sus páginas de formulario/detalle
 design-system/     Design system generado con ui-ux-pro-max
 ```

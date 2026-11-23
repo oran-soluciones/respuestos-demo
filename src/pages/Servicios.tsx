@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   CalendarClock,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
+  Eye,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -14,8 +16,7 @@ import {
 import { toast } from "sonner"
 import { EstadoServicioBadge } from "@/components/comunes/Indicadores"
 import { EncabezadoPagina } from "@/components/layout/Layout"
-import { ServicioDetalle, EtiquetaEntrega, EtiquetaTiempo } from "@/components/servicios/ServicioDetalle"
-import { ServicioDialog } from "@/components/servicios/ServicioDialog"
+import { EtiquetaEntrega, EtiquetaTiempo } from "@/components/servicios/Etiquetas"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -51,22 +52,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  formatearFecha,
-  formatearMoneda,
-  formatearNumero,
-  totalServicio,
-} from "@/lib/format"
+import { formatearFecha, formatearMoneda, formatearNumero, totalServicio } from "@/lib/format"
 import { useDatos } from "@/lib/store"
 import { ESTADOS_SERVICIO, type EstadoServicio, type Servicio } from "@/lib/types"
 
 export default function Servicios() {
   const { servicios, eliminarServicio } = useDatos()
+  const navegar = useNavigate()
   const [busqueda, setBusqueda] = useState("")
   const [estado, setEstado] = useState<EstadoServicio | "todos">("todos")
-  const [dialogoFormulario, setDialogoFormulario] = useState(false)
-  const [servicioEditar, setServicioEditar] = useState<Servicio | null>(null)
-  const [servicioDetalle, setServicioDetalle] = useState<Servicio | null>(null)
   const [servicioEliminar, setServicioEliminar] = useState<Servicio | null>(null)
 
   const filtrados = useMemo(() => {
@@ -95,24 +89,13 @@ export default function Servicios() {
     0,
   )
 
-  function abrirNuevo() {
-    setServicioEditar(null)
-    setDialogoFormulario(true)
-  }
-
-  function abrirEdicion(servicio: Servicio) {
-    setServicioEditar(servicio)
-    setServicioDetalle(null)
-    setDialogoFormulario(true)
-  }
-
   return (
     <div className="space-y-5">
       <EncabezadoPagina
         titulo="Gestión de servicios"
         descripcion="Vehículos en taller, patentes, combustible, revisiones y conclusiones"
         acciones={
-          <Button onClick={abrirNuevo}>
+          <Button onClick={() => navegar("/servicios/nuevo")}>
             <Plus className="size-4" aria-hidden="true" />
             Nuevo servicio
           </Button>
@@ -153,9 +136,7 @@ export default function Servicios() {
               <SelectTrigger id="filtro-estado-servicio" name="estado"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                {ESTADOS_SERVICIO.map((item) => (
-                  <SelectItem key={item} value={item}>{item}</SelectItem>
-                ))}
+                {ESTADOS_SERVICIO.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -185,10 +166,20 @@ export default function Servicios() {
                 </TableRow>
               ) : (
                 filtrados.map((servicio) => (
-                  <TableRow key={servicio.id}>
-                    <TableCell className="tabular whitespace-nowrap text-xs font-medium text-muted-foreground">
-                      {servicio.numero}
-                    </TableCell>
+                  <TableRow
+                    key={servicio.id}
+                    className="cursor-pointer"
+                    tabIndex={0}
+                    aria-label={`Ver detalle del servicio ${servicio.numero}`}
+                    onClick={() => navegar(`/servicios/${servicio.id}`)}
+                    onKeyDown={(evento) => {
+                      if (evento.key === "Enter" || evento.key === " ") {
+                        evento.preventDefault()
+                        navegar(`/servicios/${servicio.id}`)
+                      }
+                    }}
+                  >
+                    <TableCell className="tabular whitespace-nowrap text-xs font-medium text-muted-foreground">{servicio.numero}</TableCell>
                     <TableCell className="max-w-[190px]">
                       <p className="tabular truncate text-sm font-semibold">{servicio.patente}</p>
                       <p className="truncate text-[11px] text-muted-foreground">{servicio.cliente}</p>
@@ -197,9 +188,7 @@ export default function Servicios() {
                       <p className="truncate text-sm">{servicio.tipo}</p>
                       <p className="truncate text-[11px] text-muted-foreground">{servicio.vehiculo}</p>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                      {formatearFecha(servicio.ingresoEn)}
-                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">{formatearFecha(servicio.ingresoEn)}</TableCell>
                     <TableCell><EtiquetaTiempo ingreso={servicio.ingresoEn} entrega={servicio.entregaRealEn} compacto /></TableCell>
                     <TableCell><EtiquetaEntrega fecha={servicio.entregaEstimadaEn} compacto /></TableCell>
                     <TableCell><EstadoServicioBadge estado={servicio.estado} /></TableCell>
@@ -209,18 +198,22 @@ export default function Servicios() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" aria-label={`Acciones de ${servicio.numero}`}>
+                          <Button
+                            variant="ghost" size="icon"
+                            aria-label={`Acciones de ${servicio.numero}`}
+                            onClick={(evento) => evento.stopPropagation()}
+                          >
                             <MoreHorizontal className="size-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" onClick={(evento) => evento.stopPropagation()}>
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onSelect={() => setServicioDetalle(servicio)}>
-                            <Wrench className="size-4" aria-hidden="true" />
+                          <DropdownMenuItem onSelect={() => navegar(`/servicios/${servicio.id}`)}>
+                            <Eye className="size-4" aria-hidden="true" />
                             Ver detalle
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => abrirEdicion(servicio)}>
+                          <DropdownMenuItem onSelect={() => navegar(`/servicios/${servicio.id}/editar`)}>
                             <Pencil className="size-4" aria-hidden="true" />
                             Editar servicio
                           </DropdownMenuItem>
@@ -242,18 +235,6 @@ export default function Servicios() {
           Mostrando {filtrados.length} de {servicios.length} servicios
         </div>
       </Card>
-
-      <ServicioDialog
-        abierto={dialogoFormulario}
-        alCambiar={setDialogoFormulario}
-        servicio={servicioEditar}
-      />
-      <ServicioDetalle
-        abierto={servicioDetalle !== null}
-        alCambiar={(valor) => { if (!valor) setServicioDetalle(null) }}
-        servicio={servicioDetalle}
-        alEditar={abrirEdicion}
-      />
 
       <Dialog open={servicioEliminar !== null} onOpenChange={(valor) => { if (!valor) setServicioEliminar(null) }}>
         <DialogContent className="sm:max-w-md">

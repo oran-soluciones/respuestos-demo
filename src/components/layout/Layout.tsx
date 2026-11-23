@@ -36,6 +36,7 @@ const navegacion = [
 ]
 
 function tituloDeRuta(ruta: string): string {
+  if (ruta.startsWith("/productos")) return "Productos"
   if (ruta.startsWith("/stock")) return "Stock"
   if (ruta.startsWith("/servicios")) return "Servicios"
   return "Resumen"
@@ -43,6 +44,15 @@ function tituloDeRuta(ruta: string): string {
 
 function ContenidoSidebar({ alNavegar }: { alNavegar?: () => void }) {
   const { reiniciarDemo } = useDatos()
+  const ubicacion = useLocation()
+
+  function estaActivo(ruta: string): boolean {
+    if (ruta === "/") return ubicacion.pathname === "/"
+    if (ruta === "/stock") {
+      return ubicacion.pathname.startsWith("/stock") || ubicacion.pathname.startsWith("/productos")
+    }
+    return ubicacion.pathname.startsWith(ruta)
+  }
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -67,23 +77,17 @@ function ContenidoSidebar({ alNavegar }: { alNavegar?: () => void }) {
               to={a}
               end={a === "/"}
               onClick={alNavegar}
-              className={({ isActive }) =>
-                [
-                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-150",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                ].join(" ")
-              }
+              className={[
+                "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+                estaActivo(a)
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+              ].join(" ")}
             >
-              {({ isActive }) => (
-                <>
-                  <Icono className="size-[18px] shrink-0" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate">{etiqueta}</span>
-                  {isActive && <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />}
-                </>
-              )}
+              <Icono className="size-[18px] shrink-0" aria-hidden="true" />
+              <span className="min-w-0 flex-1 truncate">{etiqueta}</span>
+              {estaActivo(a) && <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />}
             </NavLink>
           ))}
         </nav>

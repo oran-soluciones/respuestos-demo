@@ -332,7 +332,7 @@ export default function Dashboard() {
               proximosServicios.map((servicio) => (
                 <Link
                   key={servicio.id}
-                  to="/servicios"
+                  to={`/servicios/${servicio.id}`}
                   className="flex items-center gap-3 rounded-lg border border-transparent px-2 py-2.5 transition-colors duration-150 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
@@ -375,7 +375,7 @@ export default function Dashboard() {
               productosBajos.slice(0, 5).map((producto) => (
                 <Link
                   key={producto.id}
-                  to="/stock"
+                  to={`/productos/${producto.id}`}
                   className="flex items-center gap-3 rounded-lg border border-transparent px-2 py-2.5 transition-colors duration-150 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
