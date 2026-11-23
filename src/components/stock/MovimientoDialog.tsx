@@ -86,9 +86,9 @@ export function MovimientoDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {tipo === "entrada" ? (
-              <ArrowUpRight className="size-5 text-emerald-500" aria-hidden="true" />
+              <ArrowUpRight className="size-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
             ) : (
-              <ArrowDownRight className="size-5 text-sky-400" aria-hidden="true" />
+              <ArrowDownRight className="size-5 text-sky-600 dark:text-sky-400" aria-hidden="true" />
             )}
             Registrar {tipo}
           </DialogTitle>
@@ -148,12 +148,12 @@ export function MovimientoDialog({
 
           <div className="flex items-center justify-between rounded-lg border border-dashed border-border px-3 py-2.5 text-sm">
             <span className="text-muted-foreground">Stock resultante</span>
-            <span className={`tabular font-semibold ${sinStockSuficiente ? "text-red-400" : "text-emerald-400"}`}>
+            <span className={`tabular font-semibold ${sinStockSuficiente ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
               {formatearNumero(stockFinal)} unidades
             </span>
           </div>
           {sinStockSuficiente && (
-            <p role="alert" className="text-xs text-red-400">
+            <p role="alert" className="text-xs font-medium text-red-600 dark:text-red-400">
               No hay stock suficiente para esta salida.
             </p>
           )}

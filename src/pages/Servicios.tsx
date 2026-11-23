@@ -52,7 +52,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
-  formatearFechaHora,
+  formatearFecha,
   formatearMoneda,
   formatearNumero,
   totalServicio,
@@ -161,7 +161,7 @@ export default function Servicios() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-head]]:px-3">
           <Table>
             <TableHeader>
               <TableRow>
@@ -198,10 +198,10 @@ export default function Servicios() {
                       <p className="truncate text-[11px] text-muted-foreground">{servicio.vehiculo}</p>
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                      {formatearFechaHora(servicio.ingresoEn)}
+                      {formatearFecha(servicio.ingresoEn)}
                     </TableCell>
-                    <TableCell><EtiquetaTiempo ingreso={servicio.ingresoEn} entrega={servicio.entregaRealEn} /></TableCell>
-                    <TableCell><EtiquetaEntrega fecha={servicio.entregaEstimadaEn} /></TableCell>
+                    <TableCell><EtiquetaTiempo ingreso={servicio.ingresoEn} entrega={servicio.entregaRealEn} compacto /></TableCell>
+                    <TableCell><EtiquetaEntrega fecha={servicio.entregaEstimadaEn} compacto /></TableCell>
                     <TableCell><EstadoServicioBadge estado={servicio.estado} /></TableCell>
                     <TableCell className="tabular whitespace-nowrap text-right text-sm font-semibold">
                       {formatearMoneda(totalServicio(servicio.repuestos, servicio.manoDeObra))}
@@ -209,7 +209,7 @@ export default function Servicios() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-8" aria-label={`Acciones de ${servicio.numero}`}>
+                          <Button variant="ghost" size="icon" aria-label={`Acciones de ${servicio.numero}`}>
                             <MoreHorizontal className="size-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>

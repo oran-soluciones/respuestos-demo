@@ -122,9 +122,9 @@ export function Layout() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [modoOscuro, setModoOscuro] = useState(() => {
     try {
-      return localStorage.getItem(CLAVE_TEMA) !== "claro"
+      return localStorage.getItem(CLAVE_TEMA) === "oscuro"
     } catch {
-      return true
+      return false
     }
   })
 

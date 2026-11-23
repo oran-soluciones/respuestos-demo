@@ -17,10 +17,10 @@ export function TarjetaMetrica({
   tono?: "primario" | "alerta" | "info" | "neutro"
 }) {
   const tonos = {
-    primario: "bg-primary/12 text-primary ring-primary/20",
-    alerta: "bg-amber-500/12 text-amber-500 ring-amber-500/20",
-    info: "bg-sky-500/12 text-sky-400 ring-sky-500/20",
-    neutro: "bg-muted text-muted-foreground ring-border",
+    primario: "bg-emerald-600 text-white ring-emerald-700/30",
+    alerta: "bg-amber-600 text-white ring-amber-700/30",
+    info: "bg-sky-600 text-white ring-sky-700/30",
+    neutro: "bg-slate-700 text-white ring-slate-800/30",
   }
 
   return (
@@ -43,11 +43,11 @@ export function TarjetaMetrica({
 }
 
 const estilosEstado: Record<EstadoServicio, string> = {
-  Pendiente: "border-slate-500/30 bg-slate-500/10 text-slate-300",
-  "En curso": "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  "Esperando repuestos": "border-amber-500/30 bg-amber-500/10 text-amber-400",
-  Completado: "border-violet-500/30 bg-violet-500/10 text-violet-400",
-  Entregado: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+  Pendiente: "border-slate-700 bg-slate-600 text-white",
+  "En curso": "border-sky-700 bg-sky-600 text-white",
+  "Esperando repuestos": "border-amber-700 bg-amber-600 text-white",
+  Completado: "border-violet-700 bg-violet-600 text-white",
+  Entregado: "border-emerald-700 bg-emerald-600 text-white",
 }
 
 export function EstadoServicioBadge({ estado }: { estado: EstadoServicio }) {
@@ -61,20 +61,20 @@ export function EstadoServicioBadge({ estado }: { estado: EstadoServicio }) {
 export function EstadoStockBadge({ stock, minimo }: { stock: number; minimo: number }) {
   if (stock === 0) {
     return (
-      <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-400">
+      <Badge variant="outline" className="border-red-700 bg-red-600 text-white">
         Sin stock
       </Badge>
     )
   }
   if (stock <= minimo) {
     return (
-      <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-400">
+      <Badge variant="outline" className="border-amber-700 bg-amber-600 text-white">
         Stock bajo
       </Badge>
     )
   }
   return (
-    <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+    <Badge variant="outline" className="border-emerald-700 bg-emerald-600 text-white">
       Disponible
     </Badge>
   )

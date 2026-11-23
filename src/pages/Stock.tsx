@@ -212,6 +212,7 @@ export default function Stock() {
                 <TableHead>Categoría</TableHead>
                 <TableHead>Ubicación</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Precio</TableHead>
                 <TableHead className="w-12 text-right"><span className="sr-only">Acciones</span></TableHead>
               </TableRow>
@@ -219,7 +220,7 @@ export default function Stock() {
             <TableBody>
               {filtrados.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={8} className="h-32 text-center text-sm text-muted-foreground">
                     No se encontraron productos con esos filtros.
                   </TableCell>
                 </TableRow>
@@ -239,11 +240,11 @@ export default function Stock() {
                       <span className="text-xs text-muted-foreground">{producto.categoria}</span>
                     </TableCell>
                     <TableCell className="tabular text-xs text-muted-foreground">{producto.ubicacion || "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="tabular text-sm font-semibold">{formatearNumero(producto.stock)}</span>
-                        <EstadoStockBadge stock={producto.stock} minimo={producto.stockMinimo} />
-                      </div>
+                    <TableCell className="tabular text-right text-sm font-semibold">
+                      {formatearNumero(producto.stock)}
+                    </TableCell>
+                    <TableCell>
+                      <EstadoStockBadge stock={producto.stock} minimo={producto.stockMinimo} />
                     </TableCell>
                     <TableCell className="tabular whitespace-nowrap text-right text-sm font-medium">
                       {formatearMoneda(producto.precio)}
@@ -251,7 +252,7 @@ export default function Stock() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-8" aria-label={`Acciones de ${producto.nombre}`}>
+                          <Button variant="ghost" size="icon" aria-label={`Acciones de ${producto.nombre}`}>
                             <MoreHorizontal className="size-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -263,11 +264,11 @@ export default function Stock() {
                             Editar producto
                           </DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => abrirMovimiento(producto, "entrada")}>
-                            <ArrowUpRight className="size-4 text-emerald-500" aria-hidden="true" />
+                            <ArrowUpRight className="size-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                             Registrar entrada
                           </DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => abrirMovimiento(producto, "salida")}>
-                            <ArrowDownRight className="size-4 text-sky-400" aria-hidden="true" />
+                            <ArrowDownRight className="size-4 text-sky-600 dark:text-sky-400" aria-hidden="true" />
                             Registrar salida
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />

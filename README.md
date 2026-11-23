@@ -6,7 +6,7 @@ Demo de **control de stock** y **gestión de servicios** para un comercio de rep
 - **Tailwind CSS v4 + shadcn/ui** (Radix)
 - **Recharts** para los gráficos del dashboard
 - **localStorage** como única persistencia: no hay backend ni base de datos
-- Tema **oscuro por defecto**, con opción de tema claro
+- Tema **claro en blanco y negro por defecto**, con opción de tema oscuro (botones e inputs monocromáticos; gráficos y badges con colores sólidos y texto blanco)
 - Interfaz en **español (es-AR)**
 
 ## Pantallas

@@ -1,10 +1,11 @@
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -55,8 +56,9 @@ const COLORES_GRAFICO = [
   "var(--chart-3)",
   "var(--chart-4)",
   "var(--chart-5)",
-  "var(--muted-foreground)",
+  "var(--chart-6)",
 ]
+
 
 function claveLocal(iso: string): string {
   const fecha = new Date(iso)
@@ -221,17 +223,12 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="h-[280px] pl-1 pr-3">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={datosMovimientos} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="rellenoEntradas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="rellenoSalidas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.28} />
-                    <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <BarChart
+                data={datosMovimientos}
+                margin={{ top: 8, right: 8, left: -22, bottom: 0 }}
+                barGap={2}
+                barCategoryGap="28%"
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis
                   dataKey="etiqueta"
@@ -247,28 +244,30 @@ export default function Dashboard() {
                   axisLine={false}
                   allowDecimals={false}
                 />
-                <GraficoTooltip content={<TooltipMovimientos />} cursor={{ stroke: "var(--border)" }} />
-                <Area
-                  type="monotone"
+                <GraficoTooltip content={<TooltipMovimientos />} cursor={{ fill: "var(--muted)" }} />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  height={28}
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 12, color: "var(--muted-foreground)" }}
+                />
+                <Bar
                   dataKey="entradas"
                   name="Entradas"
-                  stroke="var(--chart-1)"
-                  strokeWidth={2}
-                  fill="url(#rellenoEntradas)"
-                  activeDot={{ r: 4 }}
+                  fill="var(--chart-1)"
+                  radius={[4, 4, 0, 0]}
                   isAnimationActive={false}
                 />
-                <Area
-                  type="monotone"
+                <Bar
                   dataKey="salidas"
                   name="Salidas"
-                  stroke="var(--chart-2)"
-                  strokeWidth={2}
-                  fill="url(#rellenoSalidas)"
-                  activeDot={{ r: 4 }}
+                  fill="var(--chart-2)"
+                  radius={[4, 4, 0, 0]}
                   isAnimationActive={false}
                 />
-              </AreaChart>
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -379,7 +378,7 @@ export default function Dashboard() {
                   to="/stock"
                   className="flex items-center gap-3 rounded-lg border border-transparent px-2 py-2.5 transition-colors duration-150 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-500">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
                     <AlertTriangle className="size-4" aria-hidden="true" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -389,7 +388,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="tabular text-sm font-semibold text-amber-500">
+                    <p className="tabular text-sm font-semibold text-amber-600 dark:text-amber-400">
                       {producto.stock} <span className="text-xs font-normal text-muted-foreground">/ {producto.stockMinimo}</span>
                     </p>
                     <EstadoStockBadge stock={producto.stock} minimo={producto.stockMinimo} />
@@ -440,8 +439,8 @@ export default function Dashboard() {
                       variant="outline"
                       className={
                         movimiento.tipo === "entrada"
-                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                          : "border-sky-500/30 bg-sky-500/10 text-sky-400"
+                          ? "border-emerald-700 bg-emerald-600 text-white"
+                          : "border-sky-700 bg-sky-600 text-white"
                       }
                     >
                       {movimiento.tipo === "entrada" ? (
