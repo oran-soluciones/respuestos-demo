@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Plus, Save, Trash2 } from "lucide-react"
+import { ArrowLeft, Save } from "lucide-react"
 import { toast } from "sonner"
+import { RepuestosServicio, type FilaRepuesto } from "@/components/servicios/RepuestosServicio"
+import { SeccionServicio } from "@/components/servicios/SeccionServicio"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -14,11 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { formatearMoneda } from "@/lib/format"
 import { useDatos } from "@/lib/store"
 import { ESTADOS_SERVICIO, type EstadoServicio, type Servicio } from "@/lib/types"
-
-type RepuestoFormulario = { productoId: string; cantidad: string }
 
 type Formulario = {
   patente: string
@@ -37,7 +35,7 @@ type Formulario = {
   manoDeObra: string
   revision: string
   conclusion: string
-  repuestos: RepuestoFormulario[]
+  repuestos: FilaRepuesto[]
 }
 
 const formularioVacio: Formulario = {
@@ -91,8 +89,11 @@ function desdeServicio(servicio: Servicio): Formulario {
     revision: servicio.revision,
     conclusion: servicio.conclusion,
     repuestos: servicio.repuestos.map((repuesto) => ({
+      id: repuesto.productoId,
       productoId: repuesto.productoId,
+      nombre: repuesto.nombre,
       cantidad: String(repuesto.cantidad),
+      precioUnitario: repuesto.precioUnitario,
     })),
   }
 }
@@ -132,18 +133,6 @@ export default function ServicioForm() {
       return
     }
 
-    const repuestos = formulario.repuestos
-      .filter((item) => item.productoId && Number(item.cantidad) > 0)
-      .map((item) => {
-        const producto = productos.find((producto) => producto.id === item.productoId)!
-        return {
-          productoId: producto.id,
-          nombre: producto.nombre,
-          cantidad: Number(item.cantidad),
-          precioUnitario: producto.precio,
-        }
-      })
-
     const datos = {
       patente: formulario.patente.trim().toUpperCase(),
       vehiculo: formulario.vehiculo.trim(),
@@ -161,7 +150,14 @@ export default function ServicioForm() {
       manoDeObra: Number(formulario.manoDeObra) || 0,
       revision: formulario.revision.trim(),
       conclusion: formulario.conclusion.trim(),
-      repuestos,
+      repuestos: formulario.repuestos
+        .filter((fila) => fila.productoId && Number(fila.cantidad) > 0)
+        .map((fila) => ({
+          productoId: fila.productoId,
+          nombre: fila.nombre,
+          cantidad: Number(fila.cantidad),
+          precioUnitario: fila.precioUnitario,
+        })),
       notas: servicio?.notas ?? [],
     }
 
@@ -176,11 +172,6 @@ export default function ServicioForm() {
     }
   }
 
-  const costoRepuestos = formulario.repuestos.reduce((total, item) => {
-    const producto = productos.find((producto) => producto.id === item.productoId)
-    return total + (producto?.precio ?? 0) * (Number(item.cantidad) || 0)
-  }, 0)
-
   return (
     <div className="mx-auto max-w-5xl space-y-5">
       <Button asChild variant="ghost" size="sm">
@@ -190,17 +181,16 @@ export default function ServicioForm() {
         </Link>
       </Button>
 
-      <Card className="rounded-xl border-border/70 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-xl">{servicio ? `Editar ${servicio.numero}` : "Nuevo servicio"}</CardTitle>
-          <CardDescription>
-            Datos del vehículo, tiempos, combustible, repuestos y conclusiones del trabajo.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={guardar} className="space-y-6" noValidate>
-            <fieldset className="space-y-3">
-              <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vehículo y cliente</legend>
+      <div>
+        <h2 className="text-xl font-semibold tracking-tight">
+          {servicio ? `Editar ${servicio.numero}` : "Nuevo servicio"}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Datos del vehículo, tiempos, combustible, repuestos y conclusiones del trabajo.
+        </p>
+
+        <form onSubmit={guardar} className="mt-4 space-y-4" noValidate>
+            <SeccionServicio titulo="Vehículo y cliente">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="srv-patente">Patente</Label>
@@ -227,10 +217,9 @@ export default function ServicioForm() {
                   <Input id="srv-tipo" name="tipo" value={formulario.tipo} onChange={(e) => actualizar("tipo", e.target.value)} placeholder="Cambio de aceite, revisión general…" autoComplete="off" required />
                 </div>
               </div>
-            </fieldset>
+            </SeccionServicio>
 
-            <fieldset className="space-y-3">
-              <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estado y tiempos</legend>
+            <SeccionServicio titulo="Estado y tiempos">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="srv-estado">Estado</Label>
@@ -252,11 +241,10 @@ export default function ServicioForm() {
                   <Input id="srv-entrega-real" name="entregaRealEn" type="datetime-local" className="tabular" value={formulario.entregaRealEn} onChange={(e) => actualizar("entregaRealEn", e.target.value)} />
                 </div>
               </div>
-            </fieldset>
+            </SeccionServicio>
 
-            <fieldset className="space-y-3">
-              <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Combustible</legend>
-              <div className="grid gap-3 sm:grid-cols-3">
+            <SeccionServicio titulo="Combustible" descripcion="Estado al ingreso y reposición">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="srv-combustible">Nivel al ingreso (%)</Label>
                   <Input id="srv-combustible" name="nivelCombustible" type="number" min={0} max={100} inputMode="numeric" className="tabular" value={formulario.nivelCombustible} onChange={(e) => actualizar("nivelCombustible", e.target.value)} />
@@ -265,53 +253,25 @@ export default function ServicioForm() {
                   <Label htmlFor="srv-reposicion">Reposición (L)</Label>
                   <Input id="srv-reposicion" name="reposicionCombustible" type="number" min={0} inputMode="numeric" className="tabular" value={formulario.reposicionCombustible} onChange={(e) => actualizar("reposicionCombustible", e.target.value)} />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="srv-mano-obra">Mano de obra ($)</Label>
-                  <Input id="srv-mano-obra" name="manoDeObra" type="number" min={0} inputMode="numeric" className="tabular" value={formulario.manoDeObra} onChange={(e) => actualizar("manoDeObra", e.target.value)} />
-                </div>
-                <div className="space-y-1.5 sm:col-span-3">
+                <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="srv-obs-combustible">Observaciones de combustible</Label>
                   <Textarea id="srv-obs-combustible" name="observacionesCombustible" rows={2} value={formulario.observacionesCombustible} onChange={(e) => actualizar("observacionesCombustible", e.target.value)} placeholder="Estado al ingreso, carga realizada…" />
                 </div>
               </div>
-            </fieldset>
+            </SeccionServicio>
 
-            <fieldset className="space-y-3">
-              <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Repuestos utilizados</legend>
-              {formulario.repuestos.map((repuesto, indice) => (
-                <div key={indice} className="flex items-end gap-2">
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <Label htmlFor={`repuesto-${indice}`}>Repuesto</Label>
-                    <Select
-                      value={repuesto.productoId}
-                      onValueChange={(valor) => setFormulario((anterior) => ({ ...anterior, repuestos: anterior.repuestos.map((item, i) => (i === indice ? { ...item, productoId: valor } : item)) }))}
-                    >
-                      <SelectTrigger id={`repuesto-${indice}`}><SelectValue placeholder="Elegir repuesto" /></SelectTrigger>
-                      <SelectContent>
-                        {productos.map((producto) => (
-                          <SelectItem key={producto.id} value={producto.id}>{producto.nombre} · {formatearMoneda(producto.precio)}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="w-24 space-y-1.5">
-                    <Label htmlFor={`cantidad-${indice}`}>Cant.</Label>
-                    <Input id={`cantidad-${indice}`} type="number" min={1} inputMode="numeric" className="tabular" value={repuesto.cantidad} onChange={(e) => setFormulario((anterior) => ({ ...anterior, repuestos: anterior.repuestos.map((item, i) => (i === indice ? { ...item, cantidad: e.target.value } : item)) }))} />
-                  </div>
-                  <Button type="button" variant="ghost" size="icon" aria-label={`Quitar repuesto ${indice + 1}`} onClick={() => setFormulario((anterior) => ({ ...anterior, repuestos: anterior.repuestos.filter((_, i) => i !== indice) }))}>
-                    <Trash2 className="size-4 text-muted-foreground" aria-hidden="true" />
-                  </Button>
-                </div>
-              ))}
-              <Button type="button" variant="outline" size="sm" onClick={() => setFormulario((anterior) => ({ ...anterior, repuestos: [...anterior.repuestos, { productoId: "", cantidad: "1" }] }))}>
-                <Plus className="size-4" aria-hidden="true" />
-                Agregar repuesto
-              </Button>
-              <p className="tabular text-xs text-muted-foreground">Costo estimado de repuestos: {formatearMoneda(costoRepuestos)}</p>
-            </fieldset>
+            <SeccionServicio titulo="Repuestos utilizados" descripcion="Costo del servicio">
+              <RepuestosServicio
+                filas={formulario.repuestos}
+                productos={productos}
+                editable
+                alCambiarFilas={(filas) => setFormulario((anterior) => ({ ...anterior, repuestos: filas }))}
+                manoDeObra={formulario.manoDeObra}
+                alCambiarManoDeObra={(valor) => actualizar("manoDeObra", valor)}
+              />
+            </SeccionServicio>
 
-            <fieldset className="space-y-3">
-              <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Revisión y conclusión</legend>
+            <SeccionServicio titulo="Revisión y conclusión">
               <div className="space-y-1.5">
                 <Label htmlFor="srv-revision">Revisiones</Label>
                 <Textarea id="srv-revision" name="revision" rows={2} value={formulario.revision} onChange={(e) => actualizar("revision", e.target.value)} placeholder="Chequeos realizados, hallazgos…" />
@@ -320,7 +280,7 @@ export default function ServicioForm() {
                 <Label htmlFor="srv-conclusion">Conclusión</Label>
                 <Textarea id="srv-conclusion" name="conclusion" rows={2} value={formulario.conclusion} onChange={(e) => actualizar("conclusion", e.target.value)} placeholder="Trabajo realizado y recomendaciones…" />
               </div>
-            </fieldset>
+            </SeccionServicio>
 
             <div className="flex flex-col-reverse gap-2 border-t border-border pt-5 sm:flex-row sm:justify-end">
               <Button type="button" variant="outline" asChild>
@@ -331,9 +291,8 @@ export default function ServicioForm() {
                 {servicio ? "Guardar cambios" : "Crear servicio"}
               </Button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+        </form>
+      </div>
     </div>
   )
 }
