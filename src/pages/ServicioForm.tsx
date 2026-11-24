@@ -23,6 +23,7 @@ type RepuestoFormulario = { productoId: string; cantidad: string }
 type Formulario = {
   patente: string
   vehiculo: string
+  kilometraje: string
   cliente: string
   telefono: string
   tipo: string
@@ -42,6 +43,7 @@ type Formulario = {
 const formularioVacio: Formulario = {
   patente: "",
   vehiculo: "",
+  kilometraje: "0",
   cliente: "",
   telefono: "",
   tipo: "",
@@ -74,6 +76,7 @@ function desdeServicio(servicio: Servicio): Formulario {
   return {
     patente: servicio.patente,
     vehiculo: servicio.vehiculo,
+    kilometraje: String(servicio.kilometraje ?? 0),
     cliente: servicio.cliente,
     telefono: servicio.telefono,
     tipo: servicio.tipo,
@@ -144,6 +147,7 @@ export default function ServicioForm() {
     const datos = {
       patente: formulario.patente.trim().toUpperCase(),
       vehiculo: formulario.vehiculo.trim(),
+      kilometraje: Number(formulario.kilometraje) || 0,
       cliente: formulario.cliente.trim(),
       telefono: formulario.telefono.trim(),
       tipo: formulario.tipo.trim(),
@@ -205,6 +209,10 @@ export default function ServicioForm() {
                 <div className="space-y-1.5">
                   <Label htmlFor="srv-vehiculo">Vehículo</Label>
                   <Input id="srv-vehiculo" name="vehiculo" value={formulario.vehiculo} onChange={(e) => actualizar("vehiculo", e.target.value)} placeholder="Toyota Corolla 2020" autoComplete="off" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="srv-kilometraje">Kilometraje (km)</Label>
+                  <Input id="srv-kilometraje" name="kilometraje" type="number" min={0} step={1} inputMode="numeric" className="tabular" value={formulario.kilometraje} onChange={(e) => actualizar("kilometraje", e.target.value)} placeholder="84500" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="srv-cliente">Cliente</Label>

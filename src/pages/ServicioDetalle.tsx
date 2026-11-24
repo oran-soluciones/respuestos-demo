@@ -126,6 +126,7 @@ export default function ServicioDetalle() {
             <Campo etiqueta="Cliente" valor={servicio.cliente} />
             <Campo etiqueta="Teléfono" valor={servicio.telefono} />
             <Campo etiqueta="Vehículo" valor={servicio.vehiculo} />
+            <Campo etiqueta="Kilometraje" valor={servicio.kilometraje ? `${formatearNumero(servicio.kilometraje)} km` : "—"} />
             <Campo etiqueta="Tipo de servicio" valor={servicio.tipo} />
           </CardContent>
         </Card>

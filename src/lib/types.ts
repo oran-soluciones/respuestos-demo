@@ -64,6 +64,7 @@ export interface Servicio {
   numero: string
   patente: string
   vehiculo: string
+  kilometraje: number
   cliente: string
   telefono: string
   tipo: string

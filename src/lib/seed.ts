@@ -70,7 +70,7 @@ function crearMovimientos(productos: Producto[]): MovimientoStock[] {
 function crearServicios(): Servicio[] {
   return [
     {
-      id: "srv-148", numero: "SRV-2026-0148", patente: "AB 123 CD", vehiculo: "Toyota Corolla 2020",
+      id: "srv-148", numero: "SRV-2026-0148", patente: "AB 123 CD", vehiculo: "Toyota Corolla 2020", kilometraje: 84500,
       cliente: "María González", telefono: "11 3456 7890", tipo: "Cambio de aceite y filtro",
       estado: "En curso", ingresoEn: haceDias(2, 9), entregaEstimadaEn: haceDias(-1, 17),
       nivelCombustible: 35, observacionesCombustible: "Nivel en reserva al ingreso", reposicionCombustible: 12,
@@ -87,7 +87,7 @@ function crearServicios(): Servicio[] {
       manoDeObra: 18000,
     },
     {
-      id: "srv-147", numero: "SRV-2026-0147", patente: "XY 456 ZT", vehiculo: "Volkswagen Gol 2019",
+      id: "srv-147", numero: "SRV-2026-0147", patente: "XY 456 ZT", vehiculo: "Volkswagen Gol 2019", kilometraje: 112300,
       cliente: "Carlos Ruiz", telefono: "11 2233 4455", tipo: "Reparación de frenos",
       estado: "Esperando repuestos", ingresoEn: haceDias(4, 8, 30), entregaEstimadaEn: haceDias(-2, 16),
       nivelCombustible: 60, observacionesCombustible: "", reposicionCombustible: 0,
@@ -101,7 +101,7 @@ function crearServicios(): Servicio[] {
       manoDeObra: 26000,
     },
     {
-      id: "srv-146", numero: "SRV-2026-0146", patente: "KL 789 MN", vehiculo: "Ford Fiesta 2018",
+      id: "srv-146", numero: "SRV-2026-0146", patente: "KL 789 MN", vehiculo: "Ford Fiesta 2018", kilometraje: 96750,
       cliente: "Lucía Fernández", telefono: "11 6677 8899", tipo: "Diagnóstico de motor",
       estado: "Pendiente", ingresoEn: haceDias(0, 8, 45), entregaEstimadaEn: haceDias(-3, 17),
       nivelCombustible: 72, observacionesCombustible: "", reposicionCombustible: 0,
@@ -109,7 +109,7 @@ function crearServicios(): Servicio[] {
       revision: "", conclusion: "", repuestos: [], manoDeObra: 22000,
     },
     {
-      id: "srv-145", numero: "SRV-2026-0145", patente: "PQ 321 RS", vehiculo: "Chevrolet Onix 2021",
+      id: "srv-145", numero: "SRV-2026-0145", patente: "PQ 321 RS", vehiculo: "Chevrolet Onix 2021", kilometraje: 42300,
       cliente: "Diego Martínez", telefono: "11 5566 1122", tipo: "Alineación y balanceo",
       estado: "En curso", ingresoEn: haceDias(1, 10), entregaEstimadaEn: haceDias(-1, 13),
       nivelCombustible: 48, observacionesCombustible: "", reposicionCombustible: 0,
@@ -118,7 +118,7 @@ function crearServicios(): Servicio[] {
       repuestos: [], manoDeObra: 19500,
     },
     {
-      id: "srv-144", numero: "SRV-2026-0144", patente: "MN 654 OP", vehiculo: "Renault Sandero 2017",
+      id: "srv-144", numero: "SRV-2026-0144", patente: "MN 654 OP", vehiculo: "Renault Sandero 2017", kilometraje: 30100,
       cliente: "Ana López", telefono: "11 8899 0011", tipo: "Revisión general 30.000 km",
       estado: "Completado", ingresoEn: haceDias(6, 9), entregaEstimadaEn: haceDias(-5, 16),
       entregaRealEn: haceDias(5, 15, 30), nivelCombustible: 75, observacionesCombustible: "", reposicionCombustible: 0,
@@ -129,7 +129,7 @@ function crearServicios(): Servicio[] {
       manoDeObra: 28000,
     },
     {
-      id: "srv-143", numero: "SRV-2026-0143", patente: "RT 987 UV", vehiculo: "Peugeot 208 2020",
+      id: "srv-143", numero: "SRV-2026-0143", patente: "RT 987 UV", vehiculo: "Peugeot 208 2020", kilometraje: 67800,
       cliente: "Javier Silva", telefono: "11 4433 2211", tipo: "Cambio de batería",
       estado: "Entregado", ingresoEn: haceDias(9, 11), entregaEstimadaEn: haceDias(-8, 15),
       entregaRealEn: haceDias(8, 14), nivelCombustible: 55, observacionesCombustible: "", reposicionCombustible: 0,
@@ -139,7 +139,7 @@ function crearServicios(): Servicio[] {
       manoDeObra: 12000,
     },
     {
-      id: "srv-142", numero: "SRV-2026-0142", patente: "EF 147 GH", vehiculo: "Fiat Cronos 2022",
+      id: "srv-142", numero: "SRV-2026-0142", patente: "EF 147 GH", vehiculo: "Fiat Cronos 2022", kilometraje: 28900,
       cliente: "Sofía Romero", telefono: "11 7788 9900", tipo: "Carga de combustible y chequeo",
       estado: "En curso", ingresoEn: haceDias(1, 14), entregaEstimadaEn: haceDias(-2, 12),
       nivelCombustible: 22, observacionesCombustible: "Se carga 20 L a solicitud del cliente", reposicionCombustible: 20,
@@ -147,14 +147,14 @@ function crearServicios(): Servicio[] {
       revision: "", conclusion: "", repuestos: [], manoDeObra: 8000,
     },
     {
-      id: "srv-141", numero: "SRV-2026-0141", patente: "ZX 258 IJ", vehiculo: "Toyota Etios 2019",
+      id: "srv-141", numero: "SRV-2026-0141", patente: "ZX 258 IJ", vehiculo: "Toyota Etios 2019", kilometraje: 75400,
       cliente: "Martín Pereyra", telefono: "11 9900 3344", tipo: "Cambio de filtros",
       estado: "Pendiente", ingresoEn: haceDias(0, 9, 10), entregaEstimadaEn: haceDias(-4, 17),
       nivelCombustible: 63, observacionesCombustible: "", reposicionCombustible: 0,
       notas: [], revision: "", conclusion: "", repuestos: [], manoDeObra: 15000,
     },
     {
-      id: "srv-140", numero: "SRV-2026-0140", patente: "CV 369 KL", vehiculo: "Honda Fit 2018",
+      id: "srv-140", numero: "SRV-2026-0140", patente: "CV 369 KL", vehiculo: "Honda Fit 2018", kilometraje: 133200,
       cliente: "Valentina Costa", telefono: "11 1122 6677", tipo: "Revisión de suspensión",
       estado: "Entregado", ingresoEn: haceDias(12, 10), entregaEstimadaEn: haceDias(-11, 16),
       entregaRealEn: haceDias(11, 15), nivelCombustible: 80, observacionesCombustible: "", reposicionCombustible: 0,
